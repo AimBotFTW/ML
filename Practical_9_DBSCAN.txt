@@ -1,0 +1,51 @@
+# PRACTICAL 09 - DBSCAN CLUSTERING
+# Dataset: Mall_Customers.csv
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import DBSCAN
+
+# 1. Load the dataset
+df = pd.read_csv("Mall_Customers.csv")
+
+# 2. Select the two features used for clustering
+X = df[["Annual Income (k$)", "Spending Score (1-100)"]]
+
+# 3. Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 4. Apply DBSCAN clustering
+dbscan = DBSCAN(eps=0.3, min_samples=5)
+labels = dbscan.fit_predict(X_scaled)
+
+# 5. Add cluster labels to the dataset
+df["Cluster"] = labels
+
+# 6. Count clusters and noise points
+n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+n_noise = list(labels).count(-1)
+
+print("Number of clusters:", n_clusters)
+print("Number of noise points:", n_noise)
+
+# 7. Display the noise points
+noise_points = df[df["Cluster"] == -1]
+print("\nNoise points:")
+print(noise_points)
+
+# 8. Visualize clusters and noise points
+plt.figure(figsize=(8, 5))
+plt.scatter(
+    df["Annual Income (k$)"],
+    df["Spending Score (1-100)"],
+    c=labels,
+    cmap="tab10",
+    s=60
+)
+plt.xlabel("Annual Income (k$)")
+plt.ylabel("Spending Score (1-100)")
+plt.title("DBSCAN Clustering - Mall Customers")
+plt.show()

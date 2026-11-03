@@ -1,0 +1,57 @@
+# PRACTICAL 03 - MULTIPLE LINEAR REGRESSION
+# Dataset: Scikit-learn built-in Diabetes regression dataset
+
+import pandas as pd
+import numpy as np
+
+from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# 1. Load the dataset
+data = load_diabetes()
+X = pd.DataFrame(data.data, columns=data.feature_names)
+y = pd.Series(data.target, name="DiseaseProgression")
+
+# 2. Inspect the input data
+print("First five input records:")
+print(X.head())
+print("\nFirst five target values:")
+print(y.head())
+
+# 3. Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 4. Create and train the Multiple Linear Regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 5. Display the intercept and coefficients
+print("\nIntercept:", model.intercept_)
+print("\nCoefficients:")
+for feature, coefficient in zip(X.columns, model.coef_):
+    print(feature, ":", coefficient)
+
+# 6. Predict target values for the test data
+y_pred = model.predict(X_test)
+
+# 7. Evaluate the model using MSE, RMSE and R-squared
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
+
+print("\nMean Squared Error:", mse)
+print("Root Mean Squared Error:", rmse)
+print("R2 Score:", r2)
+
+# 8. Compare actual and predicted values
+results = pd.DataFrame({
+    "Actual": y_test.values,
+    "Predicted": y_pred
+})
+
+print("\nActual vs Predicted:")
+print(results.head(10))
